@@ -1,1 +1,406 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minigame – Quiz da Copa | Copa do Mundo FIFA</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .quiz-container {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .quiz-card {
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 8px 30px rgba(6, 95, 70, 0.12);
+      margin-bottom: 24px;
+      border: 1px solid #d1fae5;
+    }
+    .quiz-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .score-box {
+      background: linear-gradient(135deg, #065f46, #047857);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+    .progress-bar {
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 28px;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #fbbf24, #dc2626);
+      border-radius: 10px;
+      transition: width 0.4s ease;
+    }
+    .question-text {
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: #065f46;
+      margin-bottom: 24px;
+      line-height: 1.4;
+    }
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .option-btn {
+      background: #f0fdf4;
+      border: 2px solid #d1fae5;
+      border-radius: 12px;
+      padding: 16px 20px;
+      font-size: 1.05rem;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+      color: #334155;
+    }
+    .option-btn:hover:not(:disabled) {
+      border-color: #065f46;
+      background: #d1fae5;
+      transform: translateX(4px);
+    }
+    .option-btn.correct {
+      background: #d1fae5;
+      border-color: #10b981;
+      color: #065f46;
+      font-weight: 600;
+    }
+    .option-btn.wrong {
+      background: #fee2e2;
+      border-color: #ef4444;
+      color: #991b1b;
+    }
+    .option-btn:disabled {
+      cursor: default;
+    }
+    .feedback {
+      margin-top: 20px;
+      padding: 14px 18px;
+      border-radius: 10px;
+      font-weight: 500;
+      display: none;
+    }
+    .feedback.show {
+      display: block;
+    }
+    .feedback.ok {
+      background: #d1fae5;
+      color: #065f46;
+    }
+    .feedback.erro {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    .btn-next, .btn-restart, .btn-start {
+      background: #065f46;
+      color: white;
+      border: none;
+      padding: 14px 32px;
+      border-radius: 10px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: background 0.2s;
+      font-family: inherit;
+    }
+    .btn-next:hover, .btn-restart:hover, .btn-start:hover {
+      background: #064e3b;
+    }
+    .btn-next:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+    }
+    .resultado-final {
+      text-align: center;
+      padding: 20px 0;
+    }
+    .resultado-final .nota {
+      font-size: 3.5rem;
+      font-weight: 800;
+      color: #065f46;
+      margin: 16px 0;
+    }
+    .resultado-final .mensagem {
+      font-size: 1.25rem;
+      color: #475569;
+      margin-bottom: 24px;
+    }
+    .start-screen {
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .start-screen h2 {
+      color: #065f46;
+      margin-bottom: 12px;
+    }
+    .start-screen p {
+      color: #64748b;
+      margin-bottom: 28px;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .hidden {
+      display: none !important;
+    }
+    .medal {
+      font-size: 3rem;
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="logo"><i class="fas fa-trophy"></i> Copa do Mundo FIFA</div>
+      <nav>
+        <a href="index.html">Início</a>
+        <a href="index.html#anos">Por Ano</a>
+        <a href="mascotes-e-estadios.html">Mascotes & Estádios</a>
+        <a href="minigame.html" class="active">Minigame</a>
+        <a href="index.html#disciplina">Cartões & Faltas</a>
+      </nav>
+    </div>
+  </header>
 
+  <section class="hero" style="padding:40px 0;">
+    <div class="container">
+      <h1><i class="fas fa-gamepad"></i> Quiz da Copa do Mundo</h1>
+      <p>Teste seus conhecimentos sobre campeões, artilheiros, mascotes e recordes!</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <div class="quiz-container">
+        <!-- TELA INICIAL -->
+        <div class="quiz-card start-screen" id="start-screen">
+          <div class="medal">🏆</div>
+          <h2>Pronto para o desafio?</h2>
+          <p>10 perguntas sobre a história da Copa do Mundo (1930–2026). Cada acerto vale 1 ponto. Boa sorte!</p>
+          <button class="btn-start" onclick="iniciarQuiz()">Começar o Quiz</button>
+        </div>
+
+        <!-- TELA DO QUIZ -->
+        <div class="quiz-card hidden" id="quiz-screen">
+          <div class="quiz-header">
+            <div id="pergunta-num">Pergunta 1 de 10</div>
+            <div class="score-box">Pontos: <span id="score">0</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress" style="width:10%"></div>
+          </div>
+          <div class="question-text" id="question"></div>
+          <div class="options" id="options"></div>
+          <div class="feedback" id="feedback"></div>
+          <button class="btn-next hidden" id="btn-next" onclick="proximaPergunta()">Próxima →</button>
+        </div>
+
+        <!-- TELA FINAL -->
+        <div class="quiz-card resultado-final hidden" id="result-screen">
+          <div class="medal" id="medal-final">🏅</div>
+          <h2>Quiz finalizado!</h2>
+          <div class="nota"><span id="final-score">0</span>/10</div>
+          <div class="mensagem" id="final-msg"></div>
+          <button class="btn-restart" onclick="reiniciar()">Jogar de novo</button>
+          <br><br>
+          <a href="index.html" style="color:#065f46;font-weight:600;">← Voltar ao site</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>© 2026 • Site educacional sobre a Copa do Mundo FIFA</p>
+      <p><a href="index.html">Voltar ao início</a></p>
+    </div>
+  </footer>
+
+  <script>
+    const perguntas = [
+      {
+        q: "Quem foi o campeão da primeira Copa do Mundo, em 1930?",
+        opcoes: ["Brasil", "Argentina", "Uruguai", "Itália"],
+        correta: 2,
+        explicacao: "O Uruguai venceu a Argentina por 4×2 no Estadio Centenario e se tornou o primeiro campeão mundial."
+      },
+      {
+        q: "Qual jogador é o maior artilheiro da história das Copas (até 2026)?",
+        opcoes: ["Lionel Messi", "Miroslav Klose", "Kylian Mbappé", "Ronaldo"],
+        correta: 2,
+        explicacao: "Mbappé chegou a 22 gols após marcar 10 na Copa de 2026, superando Messi (21) e Klose (16)."
+      },
+      {
+        q: "Qual foi o primeiro mascote oficial da Copa do Mundo?",
+        opcoes: ["Juanito", "Willie", "Naranjito", "Footix"],
+        correta: 1,
+        explicacao: "Willie, o leão inglês de 1966, foi o primeiro mascote oficial da história das Copas."
+      },
+      {
+        q: "Em qual edição foram introduzidos oficialmente os cartões amarelos e vermelhos?",
+        opcoes: ["1966", "1970", "1974", "1982"],
+        correta: 1,
+        explicacao: "Os cartões físicos foram introduzidos na Copa de 1970, no México. O primeiro vermelho oficial veio em 1974."
+      },
+      {
+        q: "Qual país tem mais títulos de Copa do Mundo?",
+        opcoes: ["Alemanha", "Itália", "Brasil", "Argentina"],
+        correta: 2,
+        explicacao: "O Brasil é pentacampeão (1958, 1962, 1970, 1994 e 2002)."
+      },
+      {
+        q: "Quem foi o artilheiro da Copa de 2026 (Golden Boot)?",
+        opcoes: ["Lionel Messi", "Harry Kane", "Kylian Mbappé", "Erling Haaland"],
+        correta: 2,
+        explicacao: "Mbappé marcou 10 gols em 2026 e conquistou seu segundo Golden Boot consecutivo (também foi artilheiro em 2022)."
+      },
+      {
+        q: "Qual estádio sediou a final da Copa de 2026?",
+        opcoes: ["Estadio Azteca", "SoFi Stadium", "MetLife Stadium", "AT&T Stadium"],
+        correta: 2,
+        explicacao: "A final foi no MetLife Stadium, em East Rutherford (Nova Jersey). Espanha venceu a Argentina por 1×0 na prorrogação."
+      },
+      {
+        q: "Qual edição detém o recorde de mais cartões vermelhos?",
+        opcoes: ["2006", "2010", "2022", "2026"],
+        correta: 0,
+        explicacao: "A Copa de 2006 (Alemanha) teve 28 cartões vermelhos — o recorde histórico. Também teve 345 amarelos."
+      },
+      {
+        q: "Quais são os três mascotes oficiais da Copa de 2026?",
+        opcoes: [
+          "Maple, Zayu e Clutch",
+          "Fuleco, Zakumi e La’eeb",
+          "Willie, Footix e Striker",
+          "Goleo, Pille e Ciao"
+        ],
+        correta: 0,
+        explicacao: "Maple (alce – Canadá), Zayu (onça – México) e Clutch (águia – EUA). Foi a primeira vez com três mascotes."
+      },
+      {
+        q: "Quem venceu a Copa de 2026?",
+        opcoes: ["Argentina", "França", "Inglaterra", "Espanha"],
+        correta: 3,
+        explicacao: "A Espanha conquistou seu segundo título mundial ao vencer a Argentina por 1×0 na prorrogação (gol de Ferran Torres)."
+      }
+    ];
+
+    let indice = 0;
+    let pontos = 0;
+    let respondido = false;
+
+    function iniciarQuiz() {
+      document.getElementById('start-screen').classList.add('hidden');
+      document.getElementById('quiz-screen').classList.remove('hidden');
+      document.getElementById('result-screen').classList.add('hidden');
+      indice = 0;
+      pontos = 0;
+      document.getElementById('score').textContent = '0';
+      mostrarPergunta();
+    }
+
+    function mostrarPergunta() {
+      respondido = false;
+      const p = perguntas[indice];
+      document.getElementById('pergunta-num').textContent = `Pergunta ${indice + 1} de ${perguntas.length}`;
+      document.getElementById('question').textContent = p.q;
+      document.getElementById('progress').style.width = `${((indice + 1) / perguntas.length) * 100}%`;
+      const opts = document.getElementById('options');
+      opts.innerHTML = '';
+      p.opcoes.forEach((op, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = op;
+        btn.onclick = () => selecionar(i);
+        opts.appendChild(btn);
+      });
+      document.getElementById('feedback').className = 'feedback';
+      document.getElementById('feedback').textContent = '';
+      document.getElementById('btn-next').classList.add('hidden');
+    }
+
+    function selecionar(escolha) {
+      if (respondido) return;
+      respondido = true;
+      const p = perguntas[indice];
+      const botoes = document.querySelectorAll('.option-btn');
+      botoes.forEach((btn, i) => {
+        btn.disabled = true;
+        if (i === p.correta) btn.classList.add('correct');
+        if (i === escolha && escolha !== p.correta) btn.classList.add('wrong');
+      });
+      const fb = document.getElementById('feedback');
+      if (escolha === p.correta) {
+        pontos++;
+        document.getElementById('score').textContent = pontos;
+        fb.className = 'feedback show ok';
+        fb.innerHTML = `✅ Correto! ${p.explicacao}`;
+      } else {
+        fb.className = 'feedback show erro';
+        fb.innerHTML = `❌ Errado. ${p.explicacao}`;
+      }
+      document.getElementById('btn-next').classList.remove('hidden');
+      if (indice === perguntas.length - 1) {
+        document.getElementById('btn-next').textContent = 'Ver resultado →';
+      } else {
+        document.getElementById('btn-next').textContent = 'Próxima →';
+      }
+    }
+
+    function proximaPergunta() {
+      indice++;
+      if (indice < perguntas.length) {
+        mostrarPergunta();
+      } else {
+        mostrarResultado();
+      }
+    }
+
+    function mostrarResultado() {
+      document.getElementById('quiz-screen').classList.add('hidden');
+      document.getElementById('result-screen').classList.remove('hidden');
+      document.getElementById('final-score').textContent = pontos;
+      const medal = document.getElementById('medal-final');
+      const msg = document.getElementById('final-msg');
+      if (pontos === 10) {
+        medal.textContent = '🏆';
+        msg.textContent = 'Perfeito! Você é um verdadeiro expert da Copa do Mundo!';
+      } else if (pontos >= 8) {
+        medal.textContent = '🥇';
+        msg.textContent = 'Excelente! Você conhece muito bem a história das Copas.';
+      } else if (pontos >= 5) {
+        medal.textContent = '🥈';
+        msg.textContent = 'Bom trabalho! Continue explorando o site para aprender mais.';
+      } else {
+        medal.textContent = '📚';
+        msg.textContent = 'Continue estudando! Navegue pelas páginas do site e tente de novo.';
+      }
+    }
+
+    function reiniciar() {
+      document.getElementById('result-screen').classList.add('hidden');
+      document.getElementById('start-screen').classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>
